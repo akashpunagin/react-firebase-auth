@@ -1,32 +1,31 @@
 import React, { useRef, useState } from "react";
 import { Form, Card, Button, Alert } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-export default function Login() {
+export default function ForgotPassword() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   const emailRef = useRef();
-  const passwordRef = useRef();
 
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const { resetPassword } = useAuth();
 
   async function handleFormSubmit(e) {
     console.log("Submit form:login");
     e.preventDefault();
 
     const email = emailRef.current.value;
-    const password = passwordRef.current.value;
 
     try {
       setError("");
+      setMessage("");
       setLoading(true);
-      await login(email, password);
-      navigate("/");
+      await resetPassword(email);
+      setMessage("Email has been sent");
     } catch (error) {
-      setError(`Failed to login, ${error}`);
+      setError(`Failed to reset password, ${error}`);
     }
 
     setLoading(false);
@@ -36,9 +35,10 @@ export default function Login() {
     <>
       <Card>
         <Card.Body>
-          <h2 className="text-center mb-2">Log in</h2>
+          <h2 className="text-center mb-2">Forgot password</h2>
 
           {error && <Alert variant="danger">{error}</Alert>}
+          {message && <Alert variant="success">{message}</Alert>}
 
           <Form onSubmit={handleFormSubmit}>
             <Form.Group id="email">
@@ -46,32 +46,20 @@ export default function Login() {
               <Form.Control type="email" required ref={emailRef}></Form.Control>
             </Form.Group>
 
-            <Form.Group id="password">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                type="password"
-                required
-                ref={passwordRef}
-              ></Form.Control>
-            </Form.Group>
-
             {loading ? (
               <></>
             ) : (
               <Button type="submit" className="w-100">
-                Login
+                Confirm
               </Button>
             )}
           </Form>
 
           <div className="w-100 text-center mt-3">
-            <Link to="/forgot-password">Forgot password</Link>
+            <Link to="/login">Back to login</Link>
           </div>
         </Card.Body>
       </Card>
-      <div className="w-100 text-center mt-2">
-        Don't have an account? <Link to={"/signup"}>Sign up</Link>
-      </div>
     </>
   );
 }
